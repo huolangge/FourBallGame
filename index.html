@@ -16,12 +16,71 @@
             border: 0;
         }
     </style>
+
     <title>四球游戏</title>
+
     <script src="js/BoardRender.js"></script>
     <script src="js/BoardModel.js"></script>
     <script src="js/Game.js"></script>
-</head>
-<body>
 
+    <script>
+
+        /**
+         * 检查是否是触屏设备
+         * @returns {boolean}
+         */
+        function isTouchDevice() {
+            return ('ontouchstart' in document.documentElement);
+        }
+
+        /**
+         * 重新绘制canvas的大小
+         */
+        function resizeCanvas(canvas) {
+            canvas.width = document.width || document.body.clientWidth;
+            canvas.height = document.height || document.body.clientHeight;
+            //通知主游戏类Game，画布大小已经调整
+        }
+        /**
+         * 当窗口重新调整时，重新调整canvas画布大小`
+         * @param canvasId canvas元素的字符串id
+         * @returns {HTMLElement} 重新调整后的canvas元素
+         */
+        function initFullScreenCanvas(canvasId) {
+            var canvas = document.getElementById("mainCanvas");
+            resizeCanvas(canvas);
+            window.addEventListener("resize", function () {
+                resizeCanvas(canvas);
+            });
+            return canvas;
+        }
+        /**
+         * 初始化操作
+         */
+        function init() {
+            var canvas = initFullScreenCanvas("mainCanvas");
+            game = new Game(canvas);
+
+            if (isTouchDevice()) {
+                canvas.addEventListener("touchstart", function (e) {
+                    var touch = event.targetTouches[0];
+                    game.handleClick(touch.pageX, touch.pageY);
+                    e.stopPropagation();
+                    e.preventDefault();
+                }, false);
+            } else {
+                canvas.addEventListener("mouseup", function (e) {
+                    game.handleClick(e.pageX, e.pageY);
+                    e.stopPropagation();
+                    e.preventDefault();
+                }, false);
+            }
+        }
+
+        var game;
+    </script>
+</head>
+<body onload="init()">
+<canvas id="mainCanvas" width="100" height="100"></canvas>
 </body>
 </html>
